@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='binance-future',
-    version='3.0',
+    version='4.0',
     description='Binance Futures API',
     author='Philippe Remy',
     license='MIT',
