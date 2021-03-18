@@ -1,4 +1,5 @@
 ## Binance Futures
+
 Straightforward API endpoint to receive market data for Binance Futures.
 
 ### Installation
@@ -13,7 +14,14 @@ pip install binance-future
 from binance_futures import BinanceFuturesBBO
 
 bbo = BinanceFuturesBBO(symbols=['btcusdt', 'ethusdt', 'ltcusdt'])
-bbo.print_new_tickers()
+
+# prints the bid/ask of BTCUSDT along with its volumes (best bid offer).
+print(bbo.ticker('btcusdt'))
+
+# futures | btcusdt | 0.9230 @ 58875.57 | 0.0040 @ 58875.58
+
+# prints any ticker update for the symbols defined above, on the future instruments.
+bbo.print_on_ticker_update()
 
 # futures | btcusdt | 0.9230 @ 58875.57 | 0.0040 @ 58875.58
 # futures | ltcusdt | 2.2270 @ 207.15 | 28.5200 @ 207.16

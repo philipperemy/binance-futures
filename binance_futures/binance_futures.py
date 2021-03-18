@@ -61,7 +61,7 @@ class BinanceTicker:
     best_ask_qty = attr.ib(type=float)
 
     def __str__(self):
-        return f'{self.symbol} | {self.best_bid_qty:.4f} @ {self.best_bid_price:.2f} | ' \
+        return f'futures | {self.symbol} | {self.best_bid_qty:.4f} @ {self.best_bid_price:.2f} | ' \
                f'{self.best_ask_qty:.4f} @ {self.best_ask_price:.2f}'
 
     def same_prices(self, obj1):
@@ -167,11 +167,11 @@ class BinanceFuturesBBO:
     def tickers(self) -> Dict[str, BinanceTicker]:
         return {s: self.ticker(s) for s in self.symbols}
 
-    def print_new_tickers(self):
+    def print_on_ticker_update(self):
         last_tickers = self.tickers
         while True:
             new_tickers = self.tickers
             for symbol in new_tickers:
                 if not new_tickers[symbol].same_prices(last_tickers[symbol]):
-                    print('futures | ' + str(new_tickers[symbol]))
+                    print(new_tickers[symbol])
                     last_tickers[symbol] = new_tickers[symbol]
