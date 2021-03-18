@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='binance-futures',
+    name='binance-future',
     version='1.0',
     description='Binance Futures API',
     author='Philippe Remy',
