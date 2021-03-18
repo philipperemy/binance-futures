@@ -1,5 +1,5 @@
 # Binance Futures
-Straightforward API endpoint to receive market data for Binance Futures
+Straightforward API endpoint to receive market data for Binance Futures.
 
 ## Installation
 
