@@ -4,6 +4,8 @@ Straightforward API endpoint to receive market data for Binance Futures.
 
 ### Installation
 
+Recommended to use a virtual environment. Only tested with Python 3.
+
 ```bash
 pip install binance-future
 ```
