@@ -7,7 +7,11 @@ pip install binance-future
 
 ```python
 from binance_futures import BinanceFuturesBBO
-bbo = BinanceFuturesBBO()
-print(bbo.ticker)
-# 0.0140 @ 58784.87 | 0.0880 @ 58785.84
+
+# noinspection PyArgumentEqualDefault,SpellCheckingInspection
+bbo = BinanceFuturesBBO(symbols=['btcusdt', 'ethusdt', 'ltcusdt'])
+bbo.print_new_tickers()
+
+# futures | btcusdt | 0.9230 @ 58875.57 | 0.0040 @ 58875.58
+# futures | ltcusdt | 2.2270 @ 207.15 | 28.5200 @ 207.16
 ```

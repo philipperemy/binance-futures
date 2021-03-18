@@ -1,7 +1,7 @@
 import json
 import threading
 import time
-from typing import Union, List, Set
+from typing import Union, List, Set, Dict
 
 import attr
 from unicorn_binance_websocket_api.unicorn_binance_websocket_api_manager import BinanceWebSocketApiManager
@@ -61,7 +61,7 @@ class BinanceTicker:
     best_ask_qty = attr.ib(type=float)
 
     def __str__(self):
-        return f'{self.best_bid_qty:.4f} @ {self.best_bid_price:.2f} | ' \
+        return f'{self.symbol} | {self.best_bid_qty:.4f} @ {self.best_bid_price:.2f} | ' \
                f'{self.best_ask_qty:.4f} @ {self.best_ask_price:.2f}'
 
     def same_prices(self, obj1):
@@ -122,37 +122,56 @@ class BinanceMarketDataFuturesAPI:
 
 class BinanceFuturesBBO:
 
-    def __init__(self, symbol='btcusdt'):
+    def __init__(self, symbols: Union[str, List] = 'btcusdt'):
         # ticker: refreshed once per second. (1000ms).
         # miniTicker: refreshed once per second (1000ms).
         # aggTrade: The Aggregate Trade Streams push trade information that is aggregated for a single taker order (RT)
         # bookTicker: Pushes any update to the best bid or ask's price or quantity in real-time
         # for a specified symbol (RT)
-        self.symbol = symbol.lower()
-        self.messages_type = {
-            f'{self.symbol}@ticker': Ticker,
-            f'{self.symbol}@bookTicker': BookTicker,
-            f'{self.symbol}@miniTicker': MiniTicker,
-            f'{self.symbol}@aggTrade': AggTrade,
-        }
+        if isinstance(symbols, str):
+            symbols = [symbols]
+        self.symbols = [s.lower() for s in symbols]
+        self.messages_type = {}
+        for s in self.symbols:
+            self.messages_type.update({
+                f'{s}@ticker': Ticker,
+                f'{s}@bookTicker': BookTicker,
+                f'{s}@miniTicker': MiniTicker,
+                f'{s}@aggTrade': AggTrade,
+            })
         self.api = BinanceMarketDataFuturesAPI()
-        self.api.register_channels(['bookTicker'], [symbol])
+        self.api.register_channels(['bookTicker'], self.symbols)
         self.api.start(on_new_message=self.on_new_message)
-        self._last_update = None
-        while self._last_update is None:
-            time.sleep(0.01)
+        self._last_update = {}
+        while len(self._last_update) != len(self.symbols):
+            time.sleep(0.001)
 
     def on_new_message(self, data):
         message_type = self.messages_type[data['stream']]
         payload = data['data']
-        self._last_update = BinanceMarketDataMessage.from_dict(payload, message_type)
+        msg = BinanceMarketDataMessage.from_dict(payload, message_type)
+        symbol = msg.symbol.lower()
+        self._last_update[symbol] = msg
+
+    def ticker(self, symbol) -> BinanceTicker:
+        symbol = symbol.lower()
+        return BinanceTicker(
+            symbol=symbol,
+            best_bid_price=self._last_update[symbol].best_bid_price,
+            best_ask_price=self._last_update[symbol].best_ask_price,
+            best_bid_qty=self._last_update[symbol].best_bid_qty,
+            best_ask_qty=self._last_update[symbol].best_ask_qty,
+        )
 
     @property
-    def ticker(self) -> BinanceTicker:
-        return BinanceTicker(
-            symbol=self.symbol,
-            best_bid_price=self._last_update.best_bid_price,
-            best_ask_price=self._last_update.best_ask_price,
-            best_bid_qty=self._last_update.best_bid_qty,
-            best_ask_qty=self._last_update.best_ask_qty,
-        )
+    def tickers(self) -> Dict[str, BinanceTicker]:
+        return {s: self.ticker(s) for s in self.symbols}
+
+    def print_new_tickers(self):
+        last_tickers = self.tickers
+        while True:
+            new_tickers = self.tickers
+            for symbol in new_tickers:
+                if not new_tickers[symbol].same_prices(last_tickers[symbol]):
+                    print('futures | ' + str(new_tickers[symbol]))
+                    last_tickers[symbol] = new_tickers[symbol]
