@@ -20,7 +20,7 @@ print(bbo.ticker('btcusdt'))
 
 # futures | btcusdt | 0.9230 @ 58875.57 | 0.0040 @ 58875.58
 
-# prints any ticker update for the symbols defined above, on the future instruments.
+# prints any ticker update for the future instruments defined above.
 bbo.print_on_ticker_update()
 
 # futures | btcusdt | 0.9230 @ 58875.57 | 0.0040 @ 58875.58
