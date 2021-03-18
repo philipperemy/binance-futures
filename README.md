@@ -1,9 +1,13 @@
 # Binance Futures
 Straightforward API endpoint to receive market data for Binance Futures
 
+## Installation
+
 ```bash
 pip install binance-future
 ```
+
+## Example
 
 ```python
 from binance_futures import BinanceFuturesBBO
